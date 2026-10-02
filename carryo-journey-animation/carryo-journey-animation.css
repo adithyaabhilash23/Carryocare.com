@@ -181,37 +181,6 @@
   letter-spacing: 1px;
 }
 
-/* Arrival Care Elements */
-.care-circle {
-  fill: var(--background);
-  stroke: var(--brand-teal);
-  stroke-width: 1.5;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: care-pop 550ms 2.2s both;
-}
-
-.care-circle-two {
-  animation-delay: 2.45s;
-}
-
-.care-plus {
-  stroke: var(--brand-teal);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: care-pop 550ms 2.2s both;
-}
-
-.care-spark {
-  stroke: var(--brand-teal);
-  stroke-width: 1.5;
-  stroke-dasharray: 2 4;
-  fill: none;
-  animation: draw-route 600ms 2.45s both;
-}
-
 /* Vehicle Styling */
 .vehicle-body {
   fill: var(--brand-navy);
@@ -295,10 +264,6 @@
   box-sizing: border-box;
 }
 
-.map-index {
-  display: none;
-}
-
 /* Keyframe Animations */
 @keyframes draw-route {
   from {
@@ -313,17 +278,6 @@
   from {
     opacity: 0;
     scale: 0.78;
-  }
-  to {
-    opacity: 1;
-    scale: 1;
-  }
-}
-
-@keyframes care-pop {
-  from {
-    opacity: 0;
-    scale: 0.7;
   }
   to {
     opacity: 1;

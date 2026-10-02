@@ -67,18 +67,6 @@ const stickyObs = new IntersectionObserver(entries => {
 }, { threshold: 0 });
 stickyObs.observe(heroSection);
 
-// ── STATUS CARDS 3D TILT (touch-friendly)
-document.querySelectorAll('.sc').forEach(card => {
-  card.addEventListener('touchstart', () => {
-    card.style.transform = 'perspective(600px) rotateX(-4deg) translateY(-3px) scale(1.01)';
-    card.style.boxShadow = 'var(--sh-md)';
-  }, { passive: true });
-  card.addEventListener('touchend', () => {
-    card.style.transform = '';
-    card.style.boxShadow = '';
-  });
-});
-
 // ── SMOOTH SCROLL
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
