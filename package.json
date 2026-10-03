@@ -1,0 +1,27 @@
+{
+  "name": "carryocare.com-main",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adithyaabhilash23/Carryocare.com.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/adithyaabhilash23/Carryocare.com/issues"
+  },
+  "homepage": "https://github.com/adithyaabhilash23/Carryocare.com#readme",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
+    "dotenv": "^18.0.5"
+  }
+}

@@ -629,6 +629,140 @@
     </div>
   </section>
 
+  <!-- CUSTOMER REVIEWS -->
+  <section id="reviews">
+    <div class="c reveal">
+      <span class="s-label">Family Experiences</span>
+      <h2 class="s-title">What Families Say</h2>
+      <p class="s-sub">Every journey is personal. Here's what families have shared about their experience with CarryO Care.</p>
+    </div>
+
+    <div class="reviews-wrapper reveal d1">
+      <!-- Splide Slider -->
+      <section class="splide reviews-splide" id="reviews-splide" aria-label="Customer reviews" style="display: none;">
+        <div class="splide__track">
+          <ul class="splide__list" id="reviews-list">
+            <!-- Dynamically populated from database -->
+          </ul>
+        </div>
+      </section>
+
+      <!-- Tasteful Empty State (Shown if 0 reviews) -->
+      <div id="reviews-empty" class="reviews-state-card" role="status" aria-live="polite" style="display: none;">
+        <div class="state-icon" aria-hidden="true">💬</div>
+        <h3 class="state-title">No family reviews yet</h3>
+        <p class="state-desc">We'd love to hear about your experience with CarryO Care.</p>
+        <button type="button" class="btn-p open-review-modal-btn" style="margin-top: 18px;">
+          <span>⭐</span> Leave a Review
+        </button>
+      </div>
+
+      <!-- Friendly Fallback Error State -->
+      <div id="reviews-error" class="reviews-state-card" role="status" aria-live="polite" style="display: none;">
+        <div class="state-icon" aria-hidden="true">🌿</div>
+        <h3 class="state-title">Reviews Unavailable</h3>
+        <p class="state-desc">Reviews are temporarily unavailable. Please check back shortly.</p>
+      </div>
+
+      <!-- Loading skeleton while reviews are fetched -->
+      <div id="reviews-loading" class="reviews-loading-grid" aria-hidden="true">
+        <div class="review-skeleton"></div>
+        <div class="review-skeleton"></div>
+        <div class="review-skeleton"></div>
+      </div>
+    </div>
+
+    <!-- Review Submission Call to Action -->
+    <div class="reviews-cta-wrap reveal d2">
+      <div class="reviews-cta-card">
+        <div class="reviews-cta-text">
+          <h3 class="reviews-cta-title">Had a CarryO Care experience?</h3>
+          <p class="reviews-cta-desc">We'd love to hear about it. Your feedback helps other families find compassionate care.</p>
+        </div>
+        <button type="button" class="btn-p open-review-modal-btn" id="openReviewModalBtn">
+          <span>⭐</span> Leave a Review
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEW SUBMISSION MODAL -->
+  <div id="reviewModal" class="review-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle" hidden>
+    <div class="review-modal-backdrop" id="reviewModalBackdrop"></div>
+    <div class="review-modal-card">
+      <button type="button" class="modal-close-btn" id="closeReviewModalBtn" aria-label="Close review modal">✕</button>
+
+      <!-- Form View -->
+      <div id="reviewFormContainer">
+        <div class="modal-header">
+          <span class="s-label" style="margin-bottom: 8px;">Your Voice</span>
+          <h3 id="reviewModalTitle" class="modal-title">Share Your Experience</h3>
+          <p class="modal-sub">Tell us about your hospital visit or journey with CarryO Care.</p>
+        </div>
+
+        <form id="reviewForm" novalidate>
+          <!-- Anti-spam honeypot (hidden from real users) -->
+          <div class="hp-field" aria-hidden="true">
+            <label for="reviewWebsite">Leave this field blank</label>
+            <input type="text" id="reviewWebsite" name="website" tabindex="-1" autocomplete="off">
+          </div>
+
+          <!-- Rating Field -->
+          <div class="form-group">
+            <label class="form-label" id="ratingGroupLabel">Overall Rating <span class="req">*</span></label>
+            <div class="star-rating-select" id="starRatingSelect" role="radiogroup" aria-labelledby="ratingGroupLabel">
+              <button type="button" class="star-btn" role="radio" aria-checked="false" data-rating="1" aria-label="1 star">★</button>
+              <button type="button" class="star-btn" role="radio" aria-checked="false" data-rating="2" aria-label="2 stars">★</button>
+              <button type="button" class="star-btn" role="radio" aria-checked="false" data-rating="3" aria-label="3 stars">★</button>
+              <button type="button" class="star-btn" role="radio" aria-checked="false" data-rating="4" aria-label="4 stars">★</button>
+              <button type="button" class="star-btn" role="radio" aria-checked="false" data-rating="5" aria-label="5 stars">★</button>
+            </div>
+            <div class="rating-feedback-row">
+              <span id="ratingStatusText" class="rating-status-text" aria-live="polite">Select your rating</span>
+            </div>
+            <input type="hidden" id="selectedRatingInput" name="rating" value="">
+          </div>
+
+          <!-- Feedback Field -->
+          <div class="form-group">
+            <label for="reviewFeedbackInput" class="form-label">Your Feedback <span class="req">*</span></label>
+            <textarea id="reviewFeedbackInput" name="feedback" rows="4" minlength="10" maxlength="1000" required placeholder="Tell us about your experience with CarryO Care..."></textarea>
+            <div class="field-meta-row">
+              <span id="feedbackCharCount" class="char-count">0 / 1000 characters (min 10)</span>
+            </div>
+          </div>
+
+          <!-- Name Field (Optional) -->
+          <div class="form-group">
+            <label for="reviewNameInput" class="form-label">Your Name <span class="opt">(optional)</span></label>
+            <input type="text" id="reviewNameInput" name="name" maxlength="100" placeholder="e.g. Anjali M. or Family from Ernakulam">
+            <p class="field-hint">We respect your privacy. You can share your first name, initial, or leave it blank.</p>
+          </div>
+
+          <!-- Alert Message Box -->
+          <div id="reviewFormAlert" class="form-alert" role="alert" aria-live="polite" style="display: none;"></div>
+
+          <!-- Modal Actions -->
+          <div class="modal-actions">
+            <button type="button" class="btn-s modal-cancel-btn" id="cancelReviewModalBtn">Cancel</button>
+            <button type="submit" class="btn-p modal-submit-btn" id="submitReviewBtn">
+              <span class="btn-text">Submit Review</span>
+              <span class="btn-spinner" aria-hidden="true" style="display: none;"></span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Success View (shown after submission) -->
+      <div id="reviewSuccessContainer" class="review-success-view" style="display: none;" role="status" aria-live="polite">
+        <div class="success-icon" aria-hidden="true">🤍</div>
+        <h3 class="success-title">Thank you for sharing your experience</h3>
+        <p class="success-desc">Your review has been submitted and will appear after a quick review.</p>
+        <button type="button" class="btn-p success-close-btn" id="closeSuccessModalBtn">Done</button>
+      </div>
+    </div>
+  </div>
+
   <!-- CTA -->
   <section id="cta">
     <div class="reveal">
