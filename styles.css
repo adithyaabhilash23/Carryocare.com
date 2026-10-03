@@ -838,9 +838,6 @@ section {
   right: 0;
   height: 3px;
   background: linear-gradient(90deg, var(--teal), var(--mint));
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform .4s cubic-bezier(.4, 0, .2, 1);
 }
 
 .svc-card.active-card {
@@ -849,9 +846,6 @@ section {
   border-color: rgba(14, 124, 106, .2)
 }
 
-.svc-card.active-card::after {
-  transform: scaleX(1)
-}
 
 .svc-icon {
   font-size: 1.65rem;
@@ -1127,7 +1121,7 @@ section {
 footer {
   background: linear-gradient(160deg, rgba(11, 31, 58, .84), rgba(10, 92, 78, .72));
   color: rgba(255, 255, 255, .72);
-  padding: 56px 20px 32px;
+  padding: 56px 20px 88px;
   border-top: 1px solid rgba(255, 255, 255, .08);
 }
 
@@ -1280,33 +1274,55 @@ footer {
   left: 0;
   right: 0;
   z-index: 150;
-  background: rgba(255, 255, 255, .4);
+  background: rgba(255, 255, 255, .75);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border-top: 1px solid rgba(255, 255, 255, .42);
-  padding: 12px 20px;
+  border-top: 1px solid rgba(255, 255, 255, .5);
+  padding: 10px 10px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 6px;
   transform: translateY(100%);
   transition: transform .4s cubic-bezier(.4, 0, .2, 1);
-  box-shadow: 0 -12px 32px rgba(11, 31, 58, .1);
+  box-shadow: 0 -8px 28px rgba(11, 31, 58, .12);
+  box-sizing: border-box;
 }
 
 .sticky-bar.visible {
-  transform: translateY(0)
+  transform: translateY(0);
 }
 
-.sticky-bar .btn-p {
-  flex: 1;
+.sticky-bar .btn-p,
+.sticky-bar .btn-s {
+  flex: 1 1 0;
+  min-width: 0;
+  width: 0;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  padding: 14px;
-  font-size: .88rem
+  text-align: center;
+  padding: 11px 4px;
+  font-size: clamp(0.72rem, 2.6vw, 0.85rem);
+  font-weight: 700;
+  white-space: nowrap;
+  gap: 4px;
+  box-sizing: border-box;
+  text-decoration: none;
+  border-radius: var(--r-xl);
 }
 
 .sticky-bar .btn-s {
-  flex: 0 0 auto;
-  padding: 14px 20px;
-  font-size: .88rem
+  background: rgba(255, 255, 255, .72);
+  border: 1.5px solid rgba(11, 31, 58, .12);
+  color: var(--navy);
+  box-shadow: 0 4px 12px rgba(11, 31, 58, .05);
+}
+
+.sticky-bar .btn-s:hover,
+.sticky-bar .btn-s:active {
+  border-color: var(--teal);
+  color: var(--teal);
 }
 
 /* ── PROGRESS BAR ── */
@@ -1478,6 +1494,7 @@ footer {
   background: transparent;
   padding: 80px 20px;
   overflow-x: clip;
+  scroll-margin-top: 72px;
 }
 
 .reviews-wrapper {
@@ -1671,56 +1688,11 @@ footer {
   100% { background-position: -200% 0; }
 }
 
+#reviews-splide .splide__arrows,
 #reviews-splide .splide__arrow {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, .84);
-  border: 1px solid rgba(255, 255, 255, .65);
-  box-shadow: 0 4px 16px rgba(11, 31, 58, .10);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: transform var(--ease), background var(--ease), box-shadow var(--ease);
-  opacity: 1;
+  display: none !important;
 }
 
-#reviews-splide .splide__arrow:hover:not(:disabled) {
-  background: white;
-  transform: translateY(-50%) scale(1.08);
-  box-shadow: 0 6px 20px rgba(14, 124, 106, .20);
-}
-
-#reviews-splide .splide__arrow svg {
-  fill: var(--teal);
-  width: 14px;
-  height: 14px;
-}
-
-#reviews-splide .splide__arrow--prev {
-  left: -20px;
-}
-
-#reviews-splide .splide__arrow--next {
-  right: -20px;
-}
-
-@media screen and (max-width: 1240px) and (min-width: 768px) {
-  #reviews-splide {
-    padding: 0 36px !important;
-  }
-  #reviews-splide .splide__arrow--prev {
-    left: 2px;
-  }
-  #reviews-splide .splide__arrow--next {
-    right: 2px;
-  }
-}
-
-@media screen and (max-width: 767px) {
-  #reviews-splide .splide__arrow {
-    display: none !important;
-  }
-}
 
 @media screen and (min-width: 768px) {
   .reviews-loading-grid {
@@ -1759,8 +1731,10 @@ footer {
 
 .reviews-cta-wrap {
   max-width: 1200px;
-  margin: 48px auto 0;
+  margin: 40px auto 0;
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .reviews-cta-card {

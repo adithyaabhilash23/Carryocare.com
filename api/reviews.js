@@ -77,11 +77,12 @@ module.exports = async function handler(req, res) {
       const sql = neon(databaseUrl);
       let rows;
       try {
-        // Query approved reviews with name support
+        // Query approved reviews with rating >= 4 (do not expose internal id)
         rows = await sql`
-          SELECT id, rating, feedback, name, created_at
+          SELECT rating, feedback, name, created_at
           FROM reviews
           WHERE status = 'approved'
+            AND rating >= 4
           ORDER BY created_at DESC
           LIMIT 20;
         `;
@@ -89,8 +90,9 @@ module.exports = async function handler(req, res) {
         // Safe transition fallback if status column has not yet been migrated
         if (colErr.message && (colErr.message.includes('column "status"') || colErr.message.includes('status'))) {
           rows = await sql`
-            SELECT id, rating, feedback, created_at
+            SELECT rating, feedback, created_at
             FROM reviews
+            WHERE rating >= 4
             ORDER BY created_at DESC
             LIMIT 20;
           `;

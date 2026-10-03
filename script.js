@@ -104,8 +104,9 @@ initSplide();
 // =========================================
 // CUSTOMER REVIEWS
 // =========================================
+const REVIEWS_AUTOPLAY_INTERVAL = 2000;
 let reviewsSplideInstance = null;
-let reviewsFetchInitiated = false;
+let isFetchingReviews = false;
 
 function formatReviewDate(dateStr) {
   if (!dateStr) return '';
@@ -195,9 +196,24 @@ function createReviewCard(item) {
   return slide;
 }
 
-async function loadCustomerReviews() {
-  if (reviewsFetchInitiated) return;
-  reviewsFetchInitiated = true;
+function getRandomReviews(reviews, maxCount = 5) {
+  if (!Array.isArray(reviews)) return [];
+  if (reviews.length <= maxCount) return [...reviews];
+
+  // Fisher-Yates shuffle on a shallow copy to ensure unbiased, duplicate-free selection
+  const pool = [...reviews];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = pool[i];
+    pool[i] = pool[j];
+    pool[j] = temp;
+  }
+  return pool.slice(0, maxCount);
+}
+
+async function loadReviews() {
+  if (isFetchingReviews) return;
+  isFetchingReviews = true;
 
   const splideEl = document.getElementById('reviews-splide');
   const listEl = document.getElementById('reviews-list');
@@ -205,7 +221,10 @@ async function loadCustomerReviews() {
   const errorEl = document.getElementById('reviews-error');
   const loadingEl = document.getElementById('reviews-loading');
 
-  if (!splideEl || !listEl) return;
+  if (!splideEl || !listEl) {
+    isFetchingReviews = false;
+    return;
+  }
 
   function showState(target) {
     if (loadingEl) loadingEl.style.display = 'none';
@@ -223,40 +242,75 @@ async function loadCustomerReviews() {
     const data = await response.json();
 
     if (!Array.isArray(data) || data.length === 0) {
+      if (reviewsSplideInstance) {
+        try { reviewsSplideInstance.destroy(true); } catch (e) { }
+        reviewsSplideInstance = null;
+      }
+      listEl.innerHTML = '';
       showState('empty');
       return;
     }
 
-    // Filter valid reviews with non-empty feedback
-    const validReviews = data.filter(item => {
-      return item && typeof item.feedback === 'string' && item.feedback.trim().length > 0;
+    // Filter valid approved reviews strictly with rating >= 4 and non-empty feedback
+    const eligibleReviews = data.filter(item => {
+      const r = Number(item && item.rating);
+      return item &&
+        Number.isInteger(r) &&
+        r >= 4 &&
+        r <= 5 &&
+        typeof item.feedback === 'string' &&
+        item.feedback.trim().length > 0;
     });
 
-    if (validReviews.length === 0) {
+    if (eligibleReviews.length === 0) {
+      if (reviewsSplideInstance) {
+        try { reviewsSplideInstance.destroy(true); } catch (e) { }
+        reviewsSplideInstance = null;
+      }
+      listEl.innerHTML = '';
       showState('empty');
       return;
     }
 
-    // Populate reviews into splide list safely
+    // Randomly select up to 5 unique eligible reviews without duplicates
+    const selectedReviews = getRandomReviews(eligibleReviews, 5);
+
+    // Destroy previous Splide instance before re-populating slides to avoid stale state or duplicates
+    if (reviewsSplideInstance) {
+      try {
+        reviewsSplideInstance.destroy(true);
+      } catch (e) {
+        console.warn('Splide destroy warning:', e);
+      }
+      reviewsSplideInstance = null;
+    }
+
+    // Populate reviews into splide list safely using safe DOM APIs (prevents XSS)
     listEl.innerHTML = '';
-    validReviews.forEach(item => {
+    selectedReviews.forEach(item => {
       const slide = createReviewCard(item);
       listEl.appendChild(slide);
     });
 
     showState('splide');
 
-    // Mount Splide instance only after slides are rendered
-    if (!reviewsSplideInstance && typeof Splide !== 'undefined') {
-      const count = validReviews.length;
+    // Mount Splide instance only after slides are in the DOM and container is visible
+    if (typeof Splide !== 'undefined') {
+      const count = selectedReviews.length;
+      const isLoopable = count >= 3;
       try {
         reviewsSplideInstance = new Splide(splideEl, {
-          type: 'slide',
+          type: isLoopable ? 'loop' : 'slide',
+          autoplay: isLoopable,
+          interval: REVIEWS_AUTOPLAY_INTERVAL,
+          pauseOnHover: true,
+          pauseOnFocus: true,
+          resetProgress: false,
           perPage: Math.min(3, count),
           perMove: 1,
           gap: '1.5rem',
           pagination: count > 1,
-          arrows: count > 1,
+          arrows: false,
           drag: count > 1,
           keyboard: 'focused',
           rewind: false,
@@ -265,7 +319,7 @@ async function loadCustomerReviews() {
             1024: {
               perPage: Math.min(2, count),
               gap: '1.25rem',
-              arrows: count > 2,
+              arrows: false,
             },
             768: {
               perPage: 1,
@@ -281,14 +335,24 @@ async function loadCustomerReviews() {
       }
     }
   } catch (err) {
-    // Graceful error state — no database errors, credentials or technical details exposed
+    console.error('Failed to load customer reviews:', err);
+    if (reviewsSplideInstance) {
+      try { reviewsSplideInstance.destroy(true); } catch (e) { }
+      reviewsSplideInstance = null;
+    }
     showState('error');
+  } finally {
+    isFetchingReviews = false;
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadCustomerReviews);
+// Expose globally for testing, submissions, and backwards compatibility
+window.loadReviews = loadReviews;
+window.loadCustomerReviews = loadReviews;
+
+document.addEventListener('DOMContentLoaded', loadReviews);
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  loadCustomerReviews();
+  loadReviews();
 }
 
 // ==========================================
@@ -557,6 +621,11 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
         if (formContainer) formContainer.style.display = 'none';
         if (successContainer) successContainer.style.display = 'block';
         if (closeSuccessBtn) closeSuccessBtn.focus();
+
+        // Refresh reviews carousel after successful submission
+        if (typeof loadReviews === 'function') {
+          loadReviews();
+        }
       } else {
         const errorMsg = data.error || 'We could not submit your review. Please try again shortly.';
         showAlert(errorMsg, true);
