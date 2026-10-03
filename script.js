@@ -551,6 +551,8 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
       const data = await response.json();
 
       if (response.ok && data.success) {
+        setSubmittingState(false);
+
         // Show success state inside modal
         if (formContainer) formContainer.style.display = 'none';
         if (successContainer) successContainer.style.display = 'block';
